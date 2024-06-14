@@ -1,3 +1,3 @@
 export * from "./appResponse";
-// export * from "./generateToken";
 export * from "./baseUrl";
+export * from "./generateToken";
