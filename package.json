@@ -4,10 +4,9 @@
   "description": "To maintain a streamlined workflow and high-quality code, please follow these guidelines.",
   "main": "./src/server.ts",
   "scripts": {
-    "prebuild": "npm install --only=dev",
     "build": "tsc",
     "format": "prettier --write \"**/*.ts\"",
-    "postinstall": "npm run build",
+    "postinstall": "npm install --only=dev && npm run build",
     "start": "npm run build && node ./dist/server.js",
     "start:dev": "nodemon ./src/server.ts"
   },
