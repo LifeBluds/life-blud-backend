@@ -15,18 +15,3 @@ export const sendVerificationMail = async (email: string) => {
 
   await mailer(email, emailSubject, emailBody);
 };
-
-export const sendRequestMail = async (
-  email: string,
-  firstName: string,
-  organizationName: string,
-) => {
-  const emailSubject: string = `You've got a request 🚀🚀`;
-  const emailBody = renderTemplate("request-mail", {
-    firstName,
-    organizationName,
-    logoUrl: process.env.LOGO_URL,
-  });
-
-  await mailer(email, emailSubject, emailBody);
-};
