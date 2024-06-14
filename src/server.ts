@@ -6,12 +6,7 @@ import morgan from "morgan";
 import { allowedOrigins, connectDB, isLocal } from "./config";
 import { AppResponse } from "./utils";
 import Http from "./constants/statusCodes";
-<<<<<<< HEAD
 import { authRoute } from "./routes";
-=======
-
-// import { authRoute, adminRoute, facilityRoute } from "./routes";
->>>>>>> upstream/dev
 
 const app: Express = express();
 const PORT = Number(process.env.PORT) || 5000;
@@ -28,16 +23,7 @@ app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: false }));
 
 // Define Routes
-<<<<<<< HEAD
 app.use("/api/auth", authRoute);
-=======
-// app.use("/api/auth", authRoute);
-// app.use("/api/admin", adminRoute);
-// app.use("/api/facility", facilityRoute);
-// app.use('/api/donors', donorRoute);
-// app.use('/api/requests', requestRoutes'));
-// app.use('/api/appointments', appointmentRoutes'));
->>>>>>> upstream/dev
 
 app.get("/", (_req: Request, res: Response) => {
   return AppResponse(res, Http.OK, null, "Server up and running 🚀🚀", true);
