@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/api/auth", authRoute);
 
 app.get("/", (_req: Request, res: Response) => {
-  return AppResponse(res, Http.OK, null, "Server up and running 🚀🚀", true);
+  return AppResponse(res, Http.OK, null, "Server is up and running lfg 🚀🚀", true);
 });
 
 app.get("/health", (_req: Request, res: Response) => {
