@@ -7,7 +7,6 @@
     "build": "tsc",
     "format": "prettier --write \"**/*.ts\"",
     "postinstall": "npm run build",
-    "prestart": "npm install --only=dev && npm run build",
     "start": "node ./dist/server.js",
     "start:dev": "nodemon ./src/server.ts"
   },
