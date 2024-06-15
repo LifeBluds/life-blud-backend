@@ -57,7 +57,9 @@ const startServer = async () => {
     app.listen(PORT, () => {
       isLocal
         ? console.info(`Server running on http://localhost:${PORT}`)
-        : console.info(`Server running on prod`);
+        : console.info(
+            `Server running on prod on ${process.env.PROD_SERVER_URL}`,
+          );
     });
   } catch (err: any) {
     console.error(`Failed to connect to the database: ${err.message}`);
