@@ -5,6 +5,7 @@ import User from "../models/User";
 import { ValidationError } from "joi";
 import { lookUpMailSchema, onboardDonorsSchema } from "../validation";
 import bcrypt from "bcrypt";
+import { sendVerificationMail } from "../emails";
 
 export const JWT_SECRET = String(process.env.JWT_SECRET);
 
@@ -88,6 +89,8 @@ const registerDonor = async (req: Request, res: Response) => {
         pregnancyStatus,
       },
     });
+
+    await sendVerificationMail(email);
 
     return AppResponse(
       res,
