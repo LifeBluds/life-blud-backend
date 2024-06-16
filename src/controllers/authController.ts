@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
-import { AppResponse } from "../utils";
+import { AppResponse, BASE_URL } from "../utils";
 import Http from "../constants/statusCodes";
 import User from "../models/User";
 import { ValidationError } from "joi";
 import {
   completeDonorProfileSchema,
   completeFacilityProfileSchema,
+  loginSchema,
   lookUpMailSchema,
   onboardDonorsSchema,
   registerFacilitySchema,
@@ -13,6 +14,7 @@ import {
 import bcrypt from "bcrypt";
 import { sendVerificationMail } from "../emails";
 import { UserType } from "../interface";
+import jwt from "jsonwebtoken";
 
 export const JWT_SECRET = String(process.env.JWT_SECRET);
 
@@ -356,10 +358,118 @@ const completeFacilityProfile = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @desc Donor & Facility Login
+ */
+const login = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = await loginSchema.validateAsync(req.body);
+    const user = await User.findOne({ emailAddress: email }).select(
+      "+password",
+    );
+    if (!user) {
+      return AppResponse(
+        res,
+        Http.NOT_FOUND,
+        null,
+        "Invalid email or password",
+        false,
+      );
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return AppResponse(
+        res,
+        Http.UNAUTHORIZED,
+        null,
+        "Invalid email or password",
+        false,
+      );
+    }
+
+    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "1h" });
+
+    return AppResponse(
+      res,
+      Http.OK,
+      {
+        token,
+        user: {
+          role: user.userType,
+          isProfileComplete: user.isProfileComplete,
+        },
+      },
+      "Login successful",
+      true,
+    );
+  } catch (err: any) {
+    console.error("LoginError:", err);
+    if (err instanceof ValidationError) {
+      return AppResponse(
+        res,
+        Http.UNPROCESSABLE_ENTITY,
+        null,
+        err.details[0].message,
+        false,
+      );
+    }
+    return AppResponse(
+      res,
+      Http.INTERNAL_SERVER_ERROR,
+      null,
+      "An internal server error occurred",
+      false,
+    );
+  }
+};
+
+const verifyEmailAddress = async (req: Request, res: Response) => {
+  try {
+    const token: string = req.params.token;
+    const tokenInfo = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
+
+    const user = await User.findOne({ emailAddress: tokenInfo.email });
+    if (!user) {
+      return AppResponse(
+        res,
+        Http.NOT_FOUND,
+        null,
+        "Verification token is not associated with any user",
+        false,
+      );
+    } else if (user) {
+      await User.findOneAndUpdate(
+        { emailAddress: user.emailAddress },
+        { isEmailVerified: true },
+      );
+
+      console.log("Email verified successfully");
+      return res.status(200).redirect(`${BASE_URL}`); // This is to mimick the redirect to the login page
+    } else {
+      console.error(
+        "verifyEmailAddressError: email address could not be verified",
+      );
+      return res.status(403).redirect(`${BASE_URL}/create-account`); // This is to be redirected to the register page or 'email could not be verified page'
+    }
+  } catch (err: any) {
+    console.error("verifyEmailAddressError:", err);
+    return AppResponse(
+      res,
+      Http.INTERNAL_SERVER_ERROR,
+      null,
+      "An internal server error occurred",
+      false,
+    );
+  }
+};
+
 export {
   lookUpMail,
   registerDonor,
   completeDonorProfile,
   registerFacility,
   completeFacilityProfile,
+  login,
+  verifyEmailAddress,
 };
