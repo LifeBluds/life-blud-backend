@@ -1,5 +1,12 @@
 import { Types } from "mongoose";
 
+// Extend the express Request interface to include `user`
+declare module "express-serve-static-core" {
+  interface Request {
+    user?: Iuser;
+  }
+}
+
 export enum UserType {
   Donor = "Donor",
   Facility = "Facility",
