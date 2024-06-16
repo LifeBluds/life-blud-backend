@@ -6,6 +6,8 @@ import { ValidationError } from "joi";
 import { lookUpMailSchema, onboardDonorsSchema } from "../validation";
 import bcrypt from "bcrypt";
 
+export const JWT_SECRET = String(process.env.JWT_SECRET);
+
 async function hashPassword(password: string) {
   const salt = Number(process.env.SALT);
   return await bcrypt.hash(password, salt);
