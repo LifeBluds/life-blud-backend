@@ -30,3 +30,48 @@ export const rejectFacilitySchema = joi.object({
     "any.required": "Rejection Reason is required",
   }),
 });
+
+export const completeDonorProfileSchema = joi.object({
+  firstName: joi.string().trim().required().lowercase(),
+  lastName: joi.string().trim().required().lowercase(),
+  middleName: joi.string().trim().lowercase(),
+  DOB: joi.string().required(),
+  maritalStatus: joi.string().required().lowercase(),
+  gender: joi.string().required().lowercase(),
+  alternatePhoneNumber: joi.string(),
+  bio: joi.string().lowercase(),
+  image: joi.string(),
+  city: joi.string().required().lowercase(),
+  state: joi.string().required().lowercase(),
+  streetAddress: joi.string().required().lowercase(),
+  occupation: joi.string().required().lowercase(),
+  bloodGroup: joi.string().lowercase(),
+  socialMedia: joi.array().items(joi.string()),
+  lifeStyleInformation: joi
+    .object({
+      smokingStatus: joi.boolean().required(),
+      alcholConsumption: joi.boolean().required(),
+      alcholConsumptionFrequency: joi.string().lowercase(),
+      historyOfDrugAbuse: joi.boolean().required(),
+      yesHistoryOfDrugAbuse: joi.array().items(joi.string().lowercase()),
+      highRiskActivities: joi.boolean().required(),
+      yesHighRiskActivities: joi.array().items(joi.string().lowercase()),
+    })
+    .required(),
+  healthInformation: joi
+    .object({
+      recentIllnessOrInfection: joi.boolean().required(),
+      yesRecentIllnessOrInfection: joi.array().items(joi.string().lowercase()),
+      currentMedication: joi.boolean().required(),
+      yesCurrentMedication: joi.array().items(joi.string().lowercase()),
+      recentVaccination: joi.boolean().required(),
+      yesRecentVaccination: joi.array().items(joi.string().lowercase()),
+      historyOfBloodTransfusionOrOrganTransplants: joi.boolean().required(),
+      yesHistoryOfBloodTransfusionOrOrganTransplants: joi
+        .array()
+        .items(joi.string().lowercase()),
+      recentTravelHistory: joi.boolean().required(),
+      yesRecentTravelHistory: joi.array().items(joi.string().lowercase()),
+    })
+    .required(),
+});

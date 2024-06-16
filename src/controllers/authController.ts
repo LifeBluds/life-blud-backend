@@ -3,7 +3,11 @@ import { AppResponse } from "../utils";
 import Http from "../constants/statusCodes";
 import User from "../models/User";
 import { ValidationError } from "joi";
-import { lookUpMailSchema, onboardDonorsSchema } from "../validation";
+import {
+  completeDonorProfileSchema,
+  lookUpMailSchema,
+  onboardDonorsSchema,
+} from "../validation";
 import bcrypt from "bcrypt";
 import { sendVerificationMail } from "../emails";
 
@@ -120,4 +124,109 @@ const registerDonor = async (req: Request, res: Response) => {
   }
 };
 
-export { lookUpMail, registerDonor };
+/**
+ * @desc Complete the profile for donor
+ */
+const completeDonorProfile = async (req: Request, res: Response) => {
+  try {
+    const {
+      lifeStyleInformation,
+      healthInformation,
+      bloodGroup,
+      bio,
+      city,
+      streetAddress,
+      state,
+      occupation,
+      firstName,
+      middleName,
+      lastName,
+      gender,
+      maritalStatus,
+    } = await completeDonorProfileSchema.validateAsync(req.body);
+
+    const updateObject = {
+      "lifeStyleInformation.smokingStatus": lifeStyleInformation.smokingStatus,
+      "lifeStyleInformation.alcholConsumption":
+        lifeStyleInformation.alcholConsumption,
+      "lifeStyleInformation.alcholConsumptionFrequency":
+        lifeStyleInformation.alcholConsumptionFrequency,
+      "lifeStyleInformation.historyOfDrugAbuse":
+        lifeStyleInformation.historyOfDrugAbuse,
+      "lifeStyleInformation.yesHistoryOfDrugAbuse":
+        lifeStyleInformation.yesHistoryOfDrugAbuse,
+      "lifeStyleInformation.highRiskActivities":
+        lifeStyleInformation.highRiskActivities,
+      "lifeStyleInformation.yesHighRiskActivities":
+        lifeStyleInformation.yesHighRiskActivities,
+      "healthInformation.recentIllnessOrInfection":
+        healthInformation.recentIllnessOrInfection,
+      "healthInformation.yesRecentIllnessOrInfection":
+        healthInformation.yesRecentIllnessOrInfection,
+      "healthInformation.currentMedication":
+        healthInformation.currentMedication,
+      "healthInformation.yesCurrentMedication":
+        healthInformation.yesCurrentMedication,
+      "healthInformation.recentVaccination":
+        healthInformation.recentVaccination,
+      "healthInformation.yesRecentVaccination":
+        healthInformation.yesRecentVaccination,
+      "healthInformation.historyOfBloodTransfusionOrOrganTransplants":
+        healthInformation.historyOfBloodTransfusionOrOrganTransplants,
+      "healthInformation.yesHistoryOfBloodTransfusionOrOrganTransplants":
+        healthInformation.yesHistoryOfBloodTransfusionOrOrganTransplants,
+      "healthInformation.recentTravelHistory":
+        healthInformation.recentTravelHistory,
+      "healthInformation.yesRecentTravelHistory":
+        healthInformation.yesRecentTravelHistory,
+      bloodGroup,
+      bio,
+      city,
+      streetAddress,
+      state,
+      occupation,
+      firstName,
+      middleName,
+      lastName,
+      gender,
+      maritalStatus,
+      isProfileVerified: true,
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(req.user?._id, {
+      $set: updateObject,
+    });
+
+    if (!updatedUser) {
+      return AppResponse(res, Http.NOT_FOUND, null, "User not found", false);
+    }
+
+    return AppResponse(
+      res,
+      Http.OK,
+      null,
+      "Profile updated successfully",
+      true,
+    );
+  } catch (err: any) {
+    console.error("CompleteDonorProfileError:", err);
+    if (err instanceof ValidationError) {
+      return AppResponse(
+        res,
+        Http.UNPROCESSABLE_ENTITY,
+        null,
+        err.details[0].message,
+        false,
+      );
+    }
+    return AppResponse(
+      res,
+      Http.INTERNAL_SERVER_ERROR,
+      null,
+      "An internal server error occurred",
+      false,
+    );
+  }
+};
+
+export { lookUpMail, registerDonor, completeDonorProfile };
