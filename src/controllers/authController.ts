@@ -445,12 +445,12 @@ const verifyEmailAddress = async (req: Request, res: Response) => {
       );
 
       console.log("Email verified successfully");
-      return res.status(200).redirect(`${BASE_URL}`); // This is to mimick the redirect to the login page
+      return res.status(200).redirect(`${BASE_URL}`); // TODO: This is to mimick the redirect to the login page
     } else {
       console.error(
         "verifyEmailAddressError: email address could not be verified",
       );
-      return res.status(403).redirect(`${BASE_URL}/create-account`); // This is to be redirected to the register page or 'email could not be verified page'
+      return res.status(403).redirect(`${BASE_URL}/create-account`); // TODO:This is to be redirected to the register page or 'email could not be verified page'
     }
   } catch (err: any) {
     console.error("verifyEmailAddressError:", err);
