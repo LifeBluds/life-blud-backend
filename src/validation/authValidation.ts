@@ -77,10 +77,10 @@ export const completeDonorProfileSchema = joi.object({
 });
 
 export const registerFacilitySchema = joi.object({
+  firstName: joi.string().trim().lowercase().required(),
+  lastName: joi.string().trim().lowercase().required(),
   email: joi.string().email().trim().required(),
   organizationName: joi.string().trim().required(),
-  website: joi.string().trim().required(),
-  position: joi.string().trim().required(),
   phoneNumber: joi.string().trim().required(),
   password: joi.string().trim().required(),
 });
