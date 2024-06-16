@@ -5,11 +5,14 @@ import User from "../models/User";
 import { ValidationError } from "joi";
 import {
   completeDonorProfileSchema,
+  completeFacilityProfileSchema,
   lookUpMailSchema,
   onboardDonorsSchema,
+  registerFacilitySchema,
 } from "../validation";
 import bcrypt from "bcrypt";
 import { sendVerificationMail } from "../emails";
+import { UserType } from "../interface";
 
 export const JWT_SECRET = String(process.env.JWT_SECRET);
 
@@ -229,4 +232,134 @@ const completeDonorProfile = async (req: Request, res: Response) => {
   }
 };
 
-export { lookUpMail, registerDonor, completeDonorProfile };
+/**
+ * @desc Facility Registration
+ */
+const registerFacility = async (req: Request, res: Response) => {
+  try {
+    const {
+      email,
+      firstName,
+      lastName,
+      phoneNumber,
+      password,
+      organizationName,
+    } = await registerFacilitySchema.validateAsync(req.body);
+
+    const hashedPassword = await hashPassword(password);
+    await User.create({
+      firstName,
+      lastName,
+      emailAddress: email,
+      phoneNumber,
+      password: hashedPassword,
+      facilityInformation: {
+        organizationName,
+      },
+      userType: UserType.Facility,
+    });
+
+    await sendVerificationMail(email);
+
+    return AppResponse(
+      res,
+      Http.CREATED,
+      null,
+      "Facility registered successfully. Check your email to verify your account.",
+      true,
+    );
+  } catch (err: any) {
+    console.error("RegisterFacilityError:", err);
+    if (err instanceof ValidationError) {
+      return AppResponse(
+        res,
+        Http.UNPROCESSABLE_ENTITY,
+        null,
+        err.details[0].message,
+        false,
+      );
+    }
+    return AppResponse(
+      res,
+      Http.INTERNAL_SERVER_ERROR,
+      null,
+      "An internal server error occurred",
+      false,
+    );
+  }
+};
+
+/**
+ * @desc Complete the profile for Facilities
+ */
+const completeFacilityProfile = async (req: Request, res: Response) => {
+  try {
+    const { facilityInformation, accreditation } =
+      await completeFacilityProfileSchema.validateAsync(req.body);
+
+    const updateObject = {
+      "facilityInformation.organizationName":
+        facilityInformation.organizationName,
+      "facilityInformation.website": facilityInformation.website,
+      "facilityInformation.position": facilityInformation.position,
+      "facilityInformation.operationalDetails.hoursOfOperation":
+        facilityInformation.operationalDetails?.hoursOfOperation,
+      "facilityInformation.operationalDetails.daysOfOperation":
+        facilityInformation.operationalDetails?.daysOfOperation,
+      "facilityInformation.operationalDetails.bloodDonationService":
+        facilityInformation.operationalDetails?.bloodDonationService,
+      "facilityInformation.operationalDetails.capacity":
+        facilityInformation.operationalDetails?.capacity,
+      "facilityInformation.operationalDetails.specialNoteOrRequirement":
+        facilityInformation.operationalDetails?.specialNoteOrRequirement,
+      "facilityInformation.emergencyContactInformation":
+        facilityInformation.emergencyContactInformation,
+      "accreditation.accreditationBody": accreditation.accreditationBody,
+      "accreditation.accreditationNumber": accreditation.accreditationNumber,
+      "accreditation.certificate": accreditation.certificate,
+      isProfileComplete: true,
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(req.user?._id, {
+      $set: updateObject,
+    });
+
+    if (!updatedUser) {
+      return AppResponse(res, Http.NOT_FOUND, null, "User not found", false);
+    }
+
+    return AppResponse(
+      res,
+      Http.OK,
+      null,
+      "Profile completed successfully",
+      true,
+    );
+  } catch (err: any) {
+    console.error("CompleteFacilityProfileError:", err);
+    if (err instanceof ValidationError) {
+      return AppResponse(
+        res,
+        Http.UNPROCESSABLE_ENTITY,
+        null,
+        err.details[0].message,
+        false,
+      );
+    }
+    return AppResponse(
+      res,
+      Http.INTERNAL_SERVER_ERROR,
+      null,
+      "An internal server error occurred",
+      false,
+    );
+  }
+};
+
+export {
+  lookUpMail,
+  registerDonor,
+  completeDonorProfile,
+  registerFacility,
+  completeFacilityProfile,
+};

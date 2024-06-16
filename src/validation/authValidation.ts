@@ -75,3 +75,40 @@ export const completeDonorProfileSchema = joi.object({
     })
     .required(),
 });
+
+export const registerFacilitySchema = joi.object({
+  email: joi.string().email().trim().required(),
+  organizationName: joi.string().trim().required(),
+  website: joi.string().trim().required(),
+  position: joi.string().trim().required(),
+  phoneNumber: joi.string().trim().required(),
+  password: joi.string().trim().required(),
+});
+
+export const completeFacilityProfileSchema = joi.object({
+  facilityInformation: {
+    organizationName: joi.string().trim().required().lowercase(),
+    website: joi.string().trim().lowercase(),
+    position: joi.string().trim().lowercase(),
+    operationalDetails: joi
+      .object({
+        hoursOfOperation: joi.string().required(),
+        daysOfOperation: joi.string().required().trim().lowercase(),
+        bloodDonationService: joi
+          .array()
+          .items(joi.string().lowercase())
+          .required(),
+        capacity: joi.array().items(joi.string()).required(),
+        specialNoteOrRequirement: joi.string(),
+      })
+      .required(),
+    emergencyContactInformation: joi.string().required(),
+  },
+  accreditation: joi
+    .object({
+      accreditationBody: joi.string().required(),
+      accreditationNumber: joi.string().required(),
+      certificate: joi.string().required(),
+    })
+    .required(),
+});
