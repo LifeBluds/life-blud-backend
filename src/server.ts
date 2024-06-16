@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/api/auth", authRoute);
 
 app.get("/", (_req: Request, res: Response) => {
-  return AppResponse(res, Http.OK, null, "Server up and running 🚀🚀", true);
+  return AppResponse(res, Http.OK, null, "Server is up and running lfg 🚀🚀", true);
 });
 
 app.get("/health", (_req: Request, res: Response) => {
@@ -57,7 +57,9 @@ const startServer = async () => {
     app.listen(PORT, () => {
       isLocal
         ? console.info(`Server running on http://localhost:${PORT}`)
-        : console.info(`Server running on prod`);
+        : console.info(
+            `Server running on prod on ${process.env.PROD_SERVER_URL}`,
+          );
     });
   } catch (err: any) {
     console.error(`Failed to connect to the database: ${err.message}`);
