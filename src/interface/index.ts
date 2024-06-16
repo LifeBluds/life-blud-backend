@@ -57,6 +57,7 @@ interface HealthInformation {
 }
 
 interface FacilityInformation {
+  facilityType: string;
   organizationName: string;
   website: string;
   position: string;
