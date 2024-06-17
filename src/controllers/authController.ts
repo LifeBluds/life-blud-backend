@@ -80,7 +80,7 @@ const registerDonor = async (req: Request, res: Response) => {
 
     const email = rawEmail.toLowerCase();
 
-    if (age === "under 18" || weight === "below 50kg") {
+    if ((age === "1-17") || (weight === "35-49kg") || (pregnancyStatus === "yes")) {
       return AppResponse(
         res,
         Http.BAD_REQUEST,
