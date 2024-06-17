@@ -38,7 +38,6 @@ export const completeDonorProfileSchema = joi.object({
   DOB: joi.string().required(),
   maritalStatus: joi.string().required().lowercase(),
   gender: joi.string().required().lowercase(),
-  alternatePhoneNumber: joi.string(),
   bio: joi.string().lowercase(),
   image: joi.string(),
   city: joi.string().required().lowercase(),
