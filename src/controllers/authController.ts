@@ -265,7 +265,6 @@ const completeDonorProfile = async (req: Request, res: Response) => {
     );
   }
 };
-
 /**
  * @desc Facility Registration
  */
@@ -283,29 +282,43 @@ const registerFacility = async (req: Request, res: Response) => {
     } = await registerFacilitySchema.validateAsync(req.body);
 
     const hashedPassword = await hashPassword(password);
-    await User.create({
-      emailAddress: email,
-      phoneNumber,
-      password: hashedPassword,
-      streetAddress: address,
-      state,
-      city,
-      facilityInformation: {
-        facilityType,
-        regNumber,
-      },
-      userType: UserType.Facility,
-    });
+    try {
+      await User.create({
+        emailAddress: email,
+        phoneNumber,
+        password: hashedPassword,
+        streetAddress: address,
+        state,
+        city,
+        facilityInformation: {
+          facilityType,
+          regNumber,
+        },
+        userType: UserType.Facility,
+      });
 
-    await sendVerificationMail(email);
+      await sendVerificationMail(email);
 
-    return AppResponse(
-      res,
-      Http.CREATED,
-      null,
-      "Facility registered successfully. Check your email to verify your account.",
-      true,
-    );
+      return AppResponse(
+        res,
+        Http.CREATED,
+        null,
+        "Facility registered successfully. Check your email to verify your account.",
+        true,
+      );
+    } catch (mongoErr: any) {
+      if (mongoErr.code === 11000) {
+        // Handle duplicate key error
+        return AppResponse(
+          res,
+          Http.CONFLICT,
+          null,
+          "Email address already registered",
+          false,
+        );
+      }
+      throw mongoErr; // Re-throw the error if it's not a duplicate key error
+    }
   } catch (err: any) {
     console.error("RegisterFacilityError:", err);
     if (err instanceof ValidationError) {
