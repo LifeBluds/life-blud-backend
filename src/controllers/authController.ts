@@ -255,7 +255,7 @@ const registerFacility = async (req: Request, res: Response) => {
       emailAddress: email,
       phoneNumber,
       password: hashedPassword,
-      address,
+      streetAddress: address,
       state,
       city,
       facilityInformation: {

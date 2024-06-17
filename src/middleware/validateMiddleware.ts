@@ -79,3 +79,23 @@ export const authorizeFacility = async (
     );
   }
 };
+
+export const profileCheck = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const user = req.user;
+  const profileChecks = [
+    { condition: !user.isProfileComplete, message: "Profile not completed" },
+    { condition: !user.isProfileVerified, message: "Profile not verified" },
+  ];
+
+  for (const check of profileChecks) {
+    if (check.condition) {
+      return AppResponse(res, Http.UNAUTHORIZED, null, check.message);
+    }
+  }
+
+  next();
+};
