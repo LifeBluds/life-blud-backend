@@ -87,6 +87,18 @@ const registerDonor = async (req: Request, res: Response) => {
       );
     }
 
+    // Check if the user already exists
+    const existingUser = await User.findOne({ emailAddress: email });
+    if (existingUser) {
+      return AppResponse(
+        res,
+        Http.CONFLICT,
+        null,
+        "Email address already registered",
+        false,
+      );
+    }
+
     const hashedPassword = await hashPassword(password);
     await User.create({
       emailAddress: email,
