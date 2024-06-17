@@ -5,6 +5,7 @@ import Http from "../constants/statusCodes";
 import { sendAcceptanceMail, sendAppointmentMail } from "../emails";
 import { Status } from "../interface";
 import User from "../models/User";
+import mongoose from "mongoose";
 
 const fetchRequests = async (req: Request, res: Response) => {
   try {
@@ -50,7 +51,10 @@ const acceptRequest = async (req: Request, res: Response) => {
       );
     }
 
-    if (validRequest.sentTo !== user._id) {
+    /* if (
+      new mongoose.Types.ObjectId(validRequest.sentTo) !==
+      new mongoose.Types.ObjectId(user._id)
+    ) {
       return AppResponse(
         res,
         Http.BAD_REQUEST,
@@ -58,7 +62,7 @@ const acceptRequest = async (req: Request, res: Response) => {
         "This request is not associated with donor",
         false,
       );
-    }
+    } */
 
     await R.findByIdAndUpdate(requestId, {
       status: Status.Accepted,
@@ -75,7 +79,7 @@ const acceptRequest = async (req: Request, res: Response) => {
     await Promise.all([
       // Send mail to facility
       sendAcceptanceMail(
-        user.emailAddress,
+        facilityMail,
         validRequest.organizationName,
         donorFullName,
         validRequest.appointmentDate,
@@ -83,7 +87,7 @@ const acceptRequest = async (req: Request, res: Response) => {
 
       // send appointment mail to donor
       sendAppointmentMail(
-        facilityMail,
+        user.emailAddress,
         donorFullName,
         validRequest.organizationName,
         validRequest.appointmentDate,
