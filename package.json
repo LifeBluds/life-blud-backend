@@ -4,7 +4,7 @@
   "description": "To maintain a streamlined workflow and high-quality code, please follow these guidelines.",
   "main": "./dist/server.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp -r ./src/emails/templates ./dist/emails",
     "format": "prettier --write \"**/*.ts\"",
     "postinstall": "npm run build",
     "start": "node ./dist/server.js",
