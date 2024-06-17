@@ -25,13 +25,13 @@ async function hashPassword(password: string) {
 }
 
 /**
- * @desc This allows the client find out if the email address
+ * @desc This allows the client to find out if the email address
  * provided is not associated with another user
  */
 const lookUpMail = async (req: Request, res: Response) => {
   try {
     const { email } = await lookUpMailSchema.validateAsync(req.body);
-    const user = await User.findOne({ emailAddress: email });
+    const user = await User.findOne({ emailAddress: email.toLowerCase() });
 
     if (user) {
       return AppResponse(
@@ -75,8 +75,10 @@ const lookUpMail = async (req: Request, res: Response) => {
  */
 const registerDonor = async (req: Request, res: Response) => {
   try {
-    const { email, phoneNumber, password, age, weight, pregnancyStatus } =
+    const { email: rawEmail, phoneNumber, password, age, weight, pregnancyStatus } =
       await onboardDonorsSchema.validateAsync(req.body);
+
+    const email = rawEmail.toLowerCase();
 
     if (age === "under 18" || weight === "below 50kg") {
       return AppResponse(
@@ -115,8 +117,6 @@ const registerDonor = async (req: Request, res: Response) => {
         },
       });
 
-      email.toLowerCase();
-      
       await sendVerificationMail(email);
 
       return AppResponse(
