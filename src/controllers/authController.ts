@@ -115,6 +115,8 @@ const registerDonor = async (req: Request, res: Response) => {
         },
       });
 
+      email.toLowerCase();
+      
       await sendVerificationMail(email);
 
       return AppResponse(
