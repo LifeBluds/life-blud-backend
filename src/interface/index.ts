@@ -57,6 +57,7 @@ interface HealthInformation {
 }
 
 interface FacilityInformation {
+  facilityType: string;
   organizationName: string;
   website: string;
   position: string;
@@ -101,4 +102,19 @@ export interface Iuser extends Document {
   accreditation: Certification;
   isProfileComplete: boolean;
   requests: Array<Types.ObjectId>;
+}
+
+export interface Irequest extends Document {
+  sentTo: Types.ObjectId;
+  sentBy: Types.ObjectId;
+  organizationName: string;
+  organizationAddress: string;
+  appointmentDate: string;
+  status: Status;
+  respondedAt: Date;
+  rejectionReason: string;
+  additionalInformation: string;
+  bloodGroupRequired: string;
+  bloodCollectionType: string;
+  createdAt: Date;
 }

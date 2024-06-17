@@ -241,8 +241,10 @@ const registerFacility = async (req: Request, res: Response) => {
   try {
     const {
       email,
-      firstName,
-      lastName,
+      facilityType,
+      address,
+      state,
+      city,
       phoneNumber,
       password,
       organizationName,
@@ -250,12 +252,14 @@ const registerFacility = async (req: Request, res: Response) => {
 
     const hashedPassword = await hashPassword(password);
     await User.create({
-      firstName,
-      lastName,
       emailAddress: email,
       phoneNumber,
       password: hashedPassword,
+      streetAddress: address,
+      state,
+      city,
       facilityInformation: {
+        facilityType,
         organizationName,
       },
       userType: UserType.Facility,
