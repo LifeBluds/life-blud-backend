@@ -110,6 +110,7 @@ export interface Irequest extends Document {
   organizationName: string;
   organizationAddress: string;
   appointmentDate: string;
+  appointmentTime: string;
   status: Status;
   respondedAt: Date;
   rejectionReason: string;
