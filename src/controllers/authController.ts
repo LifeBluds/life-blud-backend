@@ -481,7 +481,7 @@ const verifyEmailAddress = async (req: Request, res: Response) => {
       );
 
       console.log("Email verified successfully");
-      return res.status(200).redirect(`${BASE_URL}/auth/signin.html`); // TODO: This is to mimick the redirect to the login page
+      return res.status(200).redirect(`${BASE_URL}/auth/email-verified.html`); // TODO: This is to mimick the redirect to the login page
     } else {
       console.error(
         "verifyEmailAddressError: email address could not be verified",
