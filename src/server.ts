@@ -14,7 +14,7 @@ const PORT = Number(process.env.PORT) || 5000;
 // Middleware
 app.use(
   cors({
-    origin: 'http://127.0.0.1:5500',
+    origin: allowedOrigins,
     credentials: true,
   }),
 );
