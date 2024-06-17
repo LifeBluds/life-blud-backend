@@ -18,6 +18,7 @@ import jwt from "jsonwebtoken";
 
 export const JWT_SECRET = String(process.env.JWT_SECRET);
 
+
 async function hashPassword(password: string) {
   const salt = Number(process.env.SALT);
   return await bcrypt.hash(password, salt);
@@ -100,26 +101,42 @@ const registerDonor = async (req: Request, res: Response) => {
     }
 
     const hashedPassword = await hashPassword(password);
-    await User.create({
-      emailAddress: email,
-      phoneNumber,
-      password: hashedPassword,
-      eligibilityCriteria: {
-        age,
-        weight,
-        pregnancyStatus,
-      },
-    });
 
-    await sendVerificationMail(email);
+    // Use a try-catch block to handle potential duplicate key error
+    try {
+      await User.create({
+        emailAddress: email,
+        phoneNumber,
+        password: hashedPassword,
+        eligibilityCriteria: {
+          age,
+          weight,
+          pregnancyStatus,
+        },
+      });
 
-    return AppResponse(
-      res,
-      Http.CREATED,
-      null,
-      "Donor registered successfully. Check your email to verify your account.",
-      true,
-    );
+      await sendVerificationMail(email);
+
+      return AppResponse(
+        res,
+        Http.CREATED,
+        null,
+        "Donor registered successfully. Check your email to verify your account.",
+        true,
+      );
+    } catch (mongoErr: any) {
+      if (mongoErr.code === 11000) {
+        // Handle duplicate key error
+        return AppResponse(
+          res,
+          Http.CONFLICT,
+          null,
+          "Email address already registered",
+          false,
+        );
+      }
+      throw mongoErr; // Re-throw the error if it's not a duplicate key error
+    }
   } catch (err: any) {
     console.error("RegisterDonorError:", err);
     if (err instanceof ValidationError) {
@@ -140,6 +157,7 @@ const registerDonor = async (req: Request, res: Response) => {
     );
   }
 };
+
 
 /**
  * @desc Complete the profile for donor
@@ -259,7 +277,7 @@ const registerFacility = async (req: Request, res: Response) => {
       city,
       phoneNumber,
       password,
-      organizationName,
+      regNumber,
     } = await registerFacilitySchema.validateAsync(req.body);
 
     const hashedPassword = await hashPassword(password);
@@ -272,7 +290,7 @@ const registerFacility = async (req: Request, res: Response) => {
       city,
       facilityInformation: {
         facilityType,
-        organizationName,
+        regNumber,
       },
       userType: UserType.Facility,
     });
