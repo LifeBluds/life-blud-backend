@@ -5,7 +5,7 @@ export const lookUpMailSchema = joi.object({
 });
 
 export const onboardDonorsSchema = joi.object({
-  email: joi.string().email().trim().required(),
+  email: joi.string().lowercase().email().trim().required(),
   age: joi.string().lowercase().required(),
   weight: joi.string().lowercase().required(),
   phoneNumber: joi.string().trim().required(),
