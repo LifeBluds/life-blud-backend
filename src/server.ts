@@ -6,7 +6,7 @@ import morgan from "morgan";
 import { allowedOrigins, connectDB, isLocal } from "./config";
 import { AppResponse } from "./utils";
 import Http from "./constants/statusCodes";
-import { authRoute, adminRoute, facilityRoute } from "./routes";
+import { authRoute, adminRoute, facilityRoute, donorRoute } from "./routes";
 
 const app: Express = express();
 const PORT = Number(process.env.PORT) || 5000;
@@ -26,6 +26,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/api/auth", authRoute);
 app.use("/api/admin", adminRoute);
 app.use("/api/facility", facilityRoute);
+app.use("/api/donor", donorRoute);
 
 app.get("/", (_req: Request, res: Response) => {
   return AppResponse(
