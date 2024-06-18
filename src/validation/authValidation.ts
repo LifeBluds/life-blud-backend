@@ -19,16 +19,7 @@ export const adminLoginSchema = joi.object({
 });
 
 export const rejectFacilitySchema = joi.object({
-  facilityId: joi.string().required().messages({
-    "string.base": "Facility ID should be a type of text",
-    "string.empty": "Facility ID cannot be empty",
-    "any.required": "Facility ID is required",
-  }),
-  rejectionReason: joi.string().required().messages({
-    "string.base": "Rejection Reason should be a type of text",
-    "string.empty": "Rejection Reason cannot be empty",
-    "any.required": "Rejection Reason is required",
-  }),
+  rejectionReason: joi.string().required().max(1000).trim(),
 });
 
 export const completeDonorProfileSchema = joi.object({

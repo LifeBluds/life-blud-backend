@@ -7,6 +7,7 @@ import { JWT_SECRET } from "./authController";
 import bcrypt from "bcrypt";
 import { ValidationError } from "joi";
 import jwt from "jsonwebtoken";
+import { sendProfileDeclineMail, sendProfileVerifiedMail } from "../emails";
 
 const loginAdmin = async (req: Request, res: Response) => {
   try {
@@ -120,11 +121,15 @@ const verifyFacility = async (req: Request, res: Response) => {
       isProfileVerified: true,
     });
 
-    // Send a success verification mail to facility
+    await sendProfileVerifiedMail(
+      facility.emailAddress,
+      facility.facilityInformation.organizationName,
+    );
+
     return AppResponse(
       res,
       Http.OK,
-      facility,
+      null,
       "Facility verified successfully",
       true,
     );
@@ -144,7 +149,7 @@ const verifyFacility = async (req: Request, res: Response) => {
  */
 const rejectFacility = async (req: Request, res: Response) => {
   try {
-    const { facilityId } = await rejectFacilitySchema.validateAsync(req.params);
+    const { facilityId } = req.params;
     const { rejectionReason } = await rejectFacilitySchema.validateAsync(
       req.body,
     );
@@ -161,17 +166,21 @@ const rejectFacility = async (req: Request, res: Response) => {
       );
     }
 
-    // Find the facility by ID and update the verification status
     await User.findByIdAndUpdate(facility._id, {
       isProfileVerified: false,
-      rejectionReason,
+      profileDeclineVerificationReason: rejectionReason,
     });
 
-    // Send an email notification to the facility on rejection
+    await sendProfileDeclineMail(
+      facility.emailAddress,
+      facility.facilityInformation.organizationName,
+      rejectionReason,
+    );
+
     return AppResponse(
       res,
       Http.OK,
-      facility,
+      null,
       "Facility verification rejected",
       true,
     );

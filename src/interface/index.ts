@@ -102,7 +102,7 @@ export interface Iuser extends Document {
   facilityInformation: FacilityInformation;
   accreditation: Certification;
   isProfileComplete: boolean;
-  requests: Array<Types.ObjectId>;
+  profileDeclineVerificationReason: string;
 }
 
 export interface Irequest extends Document {

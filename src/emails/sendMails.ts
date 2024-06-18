@@ -87,3 +87,35 @@ export const sendDeclineMail = async (
 
   await mailer(email, emailSubject, emailBody);
 };
+
+export const sendProfileVerifiedMail = async (
+  email: string,
+  facilityName: string,
+) => {
+  const emailSubject: string = `You Profiled has been verified 🥳🥳`;
+  const emailBody = renderTemplate("profileVerified-mail", {
+    facilityName,
+    logoUrl: process.env.LOGO_URL,
+    dashboardUrl:
+      "https://concerned-bubble-just-rail-production.pipeops.app/auth/signin.html",
+  });
+
+  await mailer(email, emailSubject, emailBody);
+};
+
+export const sendProfileDeclineMail = async (
+  email: string,
+  facilityName: string,
+  declineReason: string,
+) => {
+  const emailSubject: string = `You Profiled has been declined 😔😔`;
+  const emailBody = renderTemplate("profileDecline-mail", {
+    facilityName,
+    declineReason,
+    updateProfileUrl:
+      "https://concerned-bubble-just-rail-production.pipeops.app/auth/signin.html",
+    logoUrl: process.env.LOGO_URL,
+  });
+
+  await mailer(email, emailSubject, emailBody);
+};

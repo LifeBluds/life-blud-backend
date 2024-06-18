@@ -87,7 +87,7 @@ const userSchema: Schema<Iuser> = new Schema<Iuser>(
       certificate: { type: String },
     },
     isProfileComplete: { type: Boolean, default: false },
-    requests: [{ type: mongoose.Types.ObjectId, ref: "Request" }],
+    profileDeclineVerificationReason: { type: String },
   },
   { timestamps: true },
 );

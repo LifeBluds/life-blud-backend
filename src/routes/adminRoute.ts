@@ -23,7 +23,7 @@ router.patch(
   authorizeAdmin,
   verifyFacility,
 );
-router.patch(
+router.post(
   "/reject-facility/:facilityId",
   authMiddleware,
   authorizeAdmin,
