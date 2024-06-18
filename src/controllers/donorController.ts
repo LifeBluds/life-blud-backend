@@ -2,10 +2,14 @@ import { Request, Response } from "express";
 import R from "../models/Request";
 import { AppResponse } from "../utils";
 import Http from "../constants/statusCodes";
-import { sendAcceptanceMail, sendAppointmentMail } from "../emails";
+import {
+  sendAcceptanceMail,
+  sendAppointmentMail,
+  sendDeclineMail,
+} from "../emails";
 import { Status } from "../interface";
 import User from "../models/User";
-import mongoose from "mongoose";
+import { rejectRequestSchema } from "../validation";
 
 const fetchRequests = async (req: Request, res: Response) => {
   try {
@@ -46,7 +50,7 @@ const acceptRequest = async (req: Request, res: Response) => {
         res,
         Http.CONFLICT,
         null,
-        "This request is has been accepted",
+        "This request is has been accepted initially",
         false,
       );
     }
@@ -117,6 +121,63 @@ const acceptRequest = async (req: Request, res: Response) => {
 };
 
 const rejectRequest = async (req: Request, res: Response) => {
-  // code goes here
+  try {
+    const user = req.user;
+    const { requestId } = req.params;
+    const { rejectionReason } = await rejectRequestSchema.validateAsync(
+      req.body,
+    );
+
+    const validRequest = await R.findById(requestId);
+    if (!validRequest) {
+      return AppResponse(res, Http.NOT_FOUND, null, "Invalid request", false);
+    }
+
+    if (validRequest.status === Status.Rejected) {
+      return AppResponse(
+        res,
+        Http.CONFLICT,
+        null,
+        "This request is has been rejected initially",
+        false,
+      );
+    }
+
+    await R.findByIdAndUpdate(requestId, {
+      status: Status.Rejected,
+      respondedAt: Date.now(),
+      rejectionReason,
+    });
+
+    const donorFullName = `${user.firstName} ${user.lastName}`;
+    const facility = await User.findById(validRequest.sentBy);
+    const facilityMail = facility.emailAddress;
+
+    await sendDeclineMail(
+      facilityMail,
+      validRequest.organizationName,
+      donorFullName,
+      rejectionReason,
+    );
+
+    return AppResponse(
+      res,
+      Http.OK,
+      null,
+      "Request decline successfully",
+      true,
+    );
+
+    // send mail to decline mail to facility with the rejection reason
+  } catch (err: any) {
+    console.error("rejectRequestError:", err);
+    return AppResponse(
+      res,
+      Http.INTERNAL_SERVER_ERROR,
+      null,
+      "An internal server error occurred",
+      false,
+    );
+  }
 };
 export { fetchRequests, acceptRequest, rejectRequest };

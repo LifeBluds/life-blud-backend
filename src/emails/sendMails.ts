@@ -70,3 +70,20 @@ export const sendAppointmentMail = async (
   });
   await mailer(email, emailSubject, emailBody);
 };
+
+export const sendDeclineMail = async (
+  email: string,
+  facilityName: string,
+  donorName: string,
+  declineReason,
+) => {
+  const emailSubject: string = `Donor declines request`;
+  const emailBody = renderTemplate("decline-mail", {
+    facilityName,
+    donorName,
+    declineReason,
+    logoUrl: process.env.LOGO_URL,
+  });
+
+  await mailer(email, emailSubject, emailBody);
+};
