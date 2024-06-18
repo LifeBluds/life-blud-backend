@@ -5,6 +5,7 @@ const requestSchema: Schema<Irequest> = new Schema<Irequest>({
   organizationName: { type: String, required: true },
   organizationAddress: { type: String, required: true },
   appointmentDate: { type: String, required: false },
+  appointmentTime: { type: String, required: false },
   status: { type: String, default: Status.Pending },
   respondedAt: { type: Date, required: false },
   additionalInformation: {

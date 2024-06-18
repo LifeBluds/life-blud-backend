@@ -1,0 +1,68 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Appointment Confirmation</title>
+    <style>
+      body { font-family: Arial, sans-serif; line-height: 1.5; background-color:
+      #f8f9fc; padding: 20px; margin: 0; } .container { background-color:
+      #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,
+      0, 0, 0.1); max-width: 600px; margin: 0 auto; } .header img { max-width:
+      100px; height: auto; } .content h1 { color: #1a1a33; font-size: 24px;
+      font-weight: 500; margin-bottom: 20px; } .content p { color: #373737;
+      font-size: 16px; margin-bottom: 20px; } .button { display: inline-block;
+      background-color: #6c6bd4; color: #ffffff; text-decoration: none; padding:
+      10px 20px; border-radius: 8px; text-align: center; } .footer p { color:
+      #373737; font-size: 14px; margin-top: 10px; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <img src="{{logoUrl}}" alt="LifeBlud_Logo" />
+      </div>
+      <hr />
+      <div class="content">
+        <h1>Appointment Confirmation</h1>
+        <p>Dear {{donorName}},</p>
+        <p>
+          Thank you for accepting the request from
+          {{facilityName}}.
+        </p>
+        <p>
+          Your appointment for the donation is scheduled on
+          {{appointmentDate}}
+          at
+          {{appointmentTime}}.
+        </p>
+        <p>
+          The facility is located at:
+          <br />
+          {{facilityAddress}}
+        </p>
+        <p>
+          Phone Number:
+          <br />
+          {{facilityPhone}}
+        </p>
+        <p>
+          Please ensure you bring a valid ID and any necessary documents.
+        </p>
+        <p>
+          Remember to be well-hydrated and have eaten before your appointment to
+          ensure a smooth donation process.
+        </p>
+        <p>
+          If you have any questions or need assistance, feel free to contact us
+          at
+          <a href="mailto:support@lifeblud.com.ng">support@lifeblud.com.ng</a>.
+        </p>
+      </div>
+      <hr />
+      <div class="footer">
+        <p>Best regards,</p>
+        <p>LifeBlud Team</p>
+      </div>
+    </div>
+  </body>
+</html>

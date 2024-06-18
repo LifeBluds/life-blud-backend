@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import User from "../models/User";
-import { BASE_URL, AppResponse } from "../utils";
+import { AppResponse } from "../utils";
 import Http from "../constants/statusCodes";
 
 const JWT_SECRET = String(process.env.JWT_SECRET);
+const url = `https://concerned-bubble-just-rail-production.pipeops.app/auth/signin.html`;
 
 export const validateEmailToken = async (
   req: Request,
@@ -22,7 +23,7 @@ export const validateEmailToken = async (
     // If clients email is verified redirect client back to login page
     if (isEmailVerified) {
       console.log("Email address has been verified initially");
-      return res.redirect(`${BASE_URL}`);
+      return res.redirect(url);
     }
 
     next();
@@ -98,4 +99,33 @@ export const profileCheck = async (
   }
 
   next();
+};
+
+export const authorizeDonor = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    if (req.user.userType !== "Donor") {
+      return AppResponse(
+        res,
+        Http.FORBIDDEN,
+        null,
+        "Donor authorization required",
+        false,
+      );
+    }
+
+    next();
+  } catch (err) {
+    console.error("authorizeDonorMiddlewareError:", err);
+    return AppResponse(
+      res,
+      Http.UNAUTHORIZED,
+      null,
+      "An unexpected error has occurred",
+      false,
+    );
+  }
 };
