@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { AppResponse, BASE_URL } from "../utils";
+import { AppResponse } from "../utils";
 import Http from "../constants/statusCodes";
 import User from "../models/User";
 import { ValidationError } from "joi";
@@ -17,7 +17,6 @@ import { UserType } from "../interface";
 import jwt from "jsonwebtoken";
 
 export const JWT_SECRET = String(process.env.JWT_SECRET);
-
 
 async function hashPassword(password: string) {
   const salt = Number(process.env.SALT);
@@ -75,12 +74,18 @@ const lookUpMail = async (req: Request, res: Response) => {
  */
 const registerDonor = async (req: Request, res: Response) => {
   try {
-    const { email: rawEmail, phoneNumber, password, age, weight, pregnancyStatus } =
-      await onboardDonorsSchema.validateAsync(req.body);
+    const {
+      email: rawEmail,
+      phoneNumber,
+      password,
+      age,
+      weight,
+      pregnancyStatus,
+    } = await onboardDonorsSchema.validateAsync(req.body);
 
     const email = rawEmail.toLowerCase();
 
-    if ((age === "1-17") || (weight === "35-49kg") || (pregnancyStatus === "yes")) {
+    if (age === "1-17" || weight === "35-49kg" || pregnancyStatus === "yes") {
       return AppResponse(
         res,
         Http.BAD_REQUEST,
@@ -160,7 +165,6 @@ const registerDonor = async (req: Request, res: Response) => {
   }
 };
 
-
 /**
  * @desc Complete the profile for donor
  */
@@ -228,6 +232,7 @@ const completeDonorProfile = async (req: Request, res: Response) => {
       gender,
       maritalStatus,
       isProfileVerified: true,
+      isProfileComplete: true,
     };
 
     const updatedUser = await User.findByIdAndUpdate(req.user?._id, {
@@ -494,12 +499,20 @@ const verifyEmailAddress = async (req: Request, res: Response) => {
       );
 
       console.log("Email verified successfully");
-      return res.status(200).redirect(`${BASE_URL}/auth/email-verified.html`); // TODO: This is to mimick the redirect to the login page
+      return res
+        .status(200)
+        .redirect(
+          `https://concerned-bubble-just-rail-production.pipeops.app/auth/signin.html`,
+        );
     } else {
       console.error(
         "verifyEmailAddressError: email address could not be verified",
       );
-      return res.status(403).redirect(`${BASE_URL}`); // TODO:This is to be redirected to the register page or 'email could not be verified page'
+      return res
+        .status(403)
+        .redirect(
+          `https://concerned-bubble-just-rail-production.pipeops.app/index.html`,
+        );
     }
   } catch (err: any) {
     console.error("verifyEmailAddressError:", err);

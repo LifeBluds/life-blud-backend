@@ -79,6 +79,7 @@ const requestDonor = async (req: Request, res: Response) => {
 
     const {
       appointmentDate,
+      appointmentTime,
       additionalInformation,
       bloodCollectionType,
       bloodGroupRequired,
@@ -91,6 +92,7 @@ const requestDonor = async (req: Request, res: Response) => {
       organizationName: facilityName,
       organizationAddress: facilityAddress,
       appointmentDate,
+      appointmentTime,
       additionalInformation,
       bloodCollectionType,
       bloodGroupRequired,
