@@ -90,6 +90,7 @@ export interface Iuser extends Document {
   city: string;
   state: string;
   streetAddress: string;
+  regNumber: string;
   occupation: string;
   bloodGroup: string;
   isAccountSuspended: boolean;

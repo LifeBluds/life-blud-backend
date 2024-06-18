@@ -24,13 +24,13 @@ async function hashPassword(password: string) {
 }
 
 /**
- * @desc This allows the client find out if the email address
+ * @desc This allows the client to find out if the email address
  * provided is not associated with another user
  */
 const lookUpMail = async (req: Request, res: Response) => {
   try {
     const { email } = await lookUpMailSchema.validateAsync(req.body);
-    const user = await User.findOne({ emailAddress: email });
+    const user = await User.findOne({ emailAddress: email.toLowerCase() });
 
     if (user) {
       return AppResponse(
@@ -74,10 +74,18 @@ const lookUpMail = async (req: Request, res: Response) => {
  */
 const registerDonor = async (req: Request, res: Response) => {
   try {
-    const { email, phoneNumber, password, age, weight, pregnancyStatus } =
-      await onboardDonorsSchema.validateAsync(req.body);
+    const {
+      email: rawEmail,
+      phoneNumber,
+      password,
+      age,
+      weight,
+      pregnancyStatus,
+    } = await onboardDonorsSchema.validateAsync(req.body);
 
-    if (age === "under 18" || weight === "below 50kg") {
+    const email = rawEmail.toLowerCase();
+
+    if (age === "1-17" || weight === "35-49kg" || pregnancyStatus === "yes") {
       return AppResponse(
         res,
         Http.BAD_REQUEST,
@@ -100,26 +108,42 @@ const registerDonor = async (req: Request, res: Response) => {
     }
 
     const hashedPassword = await hashPassword(password);
-    await User.create({
-      emailAddress: email,
-      phoneNumber,
-      password: hashedPassword,
-      eligibilityCriteria: {
-        age,
-        weight,
-        pregnancyStatus,
-      },
-    });
 
-    await sendVerificationMail(email);
+    // Use a try-catch block to handle potential duplicate key error
+    try {
+      await User.create({
+        emailAddress: email,
+        phoneNumber,
+        password: hashedPassword,
+        eligibilityCriteria: {
+          age,
+          weight,
+          pregnancyStatus,
+        },
+      });
 
-    return AppResponse(
-      res,
-      Http.CREATED,
-      null,
-      "Donor registered successfully. Check your email to verify your account.",
-      true,
-    );
+      await sendVerificationMail(email);
+
+      return AppResponse(
+        res,
+        Http.CREATED,
+        null,
+        "Donor registered successfully. Check your email to verify your account.",
+        true,
+      );
+    } catch (mongoErr: any) {
+      if (mongoErr.code === 11000) {
+        // Handle duplicate key error
+        return AppResponse(
+          res,
+          Http.CONFLICT,
+          null,
+          "Email address already registered",
+          false,
+        );
+      }
+      throw mongoErr; // Re-throw the error if it's not a duplicate key error
+    }
   } catch (err: any) {
     console.error("RegisterDonorError:", err);
     if (err instanceof ValidationError) {
@@ -246,7 +270,6 @@ const completeDonorProfile = async (req: Request, res: Response) => {
     );
   }
 };
-
 /**
  * @desc Facility Registration
  */
@@ -260,33 +283,47 @@ const registerFacility = async (req: Request, res: Response) => {
       city,
       phoneNumber,
       password,
-      organizationName,
+      regNumber,
     } = await registerFacilitySchema.validateAsync(req.body);
 
     const hashedPassword = await hashPassword(password);
-    await User.create({
-      emailAddress: email,
-      phoneNumber,
-      password: hashedPassword,
-      streetAddress: address,
-      state,
-      city,
-      facilityInformation: {
-        facilityType,
-        organizationName,
-      },
-      userType: UserType.Facility,
-    });
+    try {
+      await User.create({
+        emailAddress: email,
+        phoneNumber,
+        password: hashedPassword,
+        streetAddress: address,
+        state,
+        city,
+        facilityInformation: {
+          facilityType,
+          regNumber,
+        },
+        userType: UserType.Facility,
+      });
 
-    await sendVerificationMail(email);
+      await sendVerificationMail(email);
 
-    return AppResponse(
-      res,
-      Http.CREATED,
-      null,
-      "Facility registered successfully. Check your email to verify your account.",
-      true,
-    );
+      return AppResponse(
+        res,
+        Http.CREATED,
+        null,
+        "Facility registered successfully. Check your email to verify your account.",
+        true,
+      );
+    } catch (mongoErr: any) {
+      if (mongoErr.code === 11000) {
+        // Handle duplicate key error
+        return AppResponse(
+          res,
+          Http.CONFLICT,
+          null,
+          "Email address already registered",
+          false,
+        );
+      }
+      throw mongoErr; // Re-throw the error if it's not a duplicate key error
+    }
   } catch (err: any) {
     console.error("RegisterFacilityError:", err);
     if (err instanceof ValidationError) {

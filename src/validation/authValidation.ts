@@ -5,7 +5,7 @@ export const lookUpMailSchema = joi.object({
 });
 
 export const onboardDonorsSchema = joi.object({
-  email: joi.string().email().trim().required(),
+  email: joi.string().lowercase().email().trim().required(),
   age: joi.string().lowercase().required(),
   weight: joi.string().lowercase().required(),
   phoneNumber: joi.string().trim().required(),
@@ -38,7 +38,6 @@ export const completeDonorProfileSchema = joi.object({
   DOB: joi.string().required(),
   maritalStatus: joi.string().required().lowercase(),
   gender: joi.string().required().lowercase(),
-  alternatePhoneNumber: joi.string(),
   bio: joi.string().lowercase(),
   image: joi.string(),
   city: joi.string().required().lowercase(),
@@ -79,7 +78,7 @@ export const completeDonorProfileSchema = joi.object({
 export const registerFacilitySchema = joi.object({
   facilityType: joi.string().trim().lowercase().required(),
   email: joi.string().email().trim().required().lowercase(),
-  organizationName: joi.string().trim().required().lowercase(),
+  regNumber: joi.string().trim().lowercase(),
   phoneNumber: joi.string().trim().required(),
   address: joi.string().trim().required().lowercase(),
   city: joi.string().trim().required().lowercase(),
