@@ -1,7 +1,7 @@
 import joi from "joi";
 
 export const lookUpMailSchema = joi.object({
-  email: joi.string().email().trim().required(),
+  email: joi.string().email().trim().required().lowercase(),
 });
 
 export const onboardDonorsSchema = joi.object({

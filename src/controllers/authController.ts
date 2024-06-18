@@ -30,7 +30,7 @@ async function hashPassword(password: string) {
 const lookUpMail = async (req: Request, res: Response) => {
   try {
     const { email } = await lookUpMailSchema.validateAsync(req.body);
-    const user = await User.findOne({ emailAddress: email.toLowerCase() });
+    const user = await User.findOne({ emailAddress: email });
 
     if (user) {
       return AppResponse(
@@ -74,16 +74,8 @@ const lookUpMail = async (req: Request, res: Response) => {
  */
 const registerDonor = async (req: Request, res: Response) => {
   try {
-    const {
-      email: rawEmail,
-      phoneNumber,
-      password,
-      age,
-      weight,
-      pregnancyStatus,
-    } = await onboardDonorsSchema.validateAsync(req.body);
-
-    const email = rawEmail.toLowerCase();
+    const { email, phoneNumber, password, age, weight, pregnancyStatus } =
+      await onboardDonorsSchema.validateAsync(req.body);
 
     if (age === "1-17" || weight === "35-49kg" || pregnancyStatus === "yes") {
       return AppResponse(
