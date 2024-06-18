@@ -35,7 +35,6 @@ export const completeDonorProfileSchema = joi.object({
   firstName: joi.string().trim().required().lowercase(),
   lastName: joi.string().trim().required().lowercase(),
   middleName: joi.string().trim().lowercase(),
-  DOB: joi.string().required(),
   maritalStatus: joi.string().required().lowercase(),
   gender: joi.string().required().lowercase(),
   bio: joi.string().lowercase(),
@@ -45,7 +44,6 @@ export const completeDonorProfileSchema = joi.object({
   streetAddress: joi.string().required().lowercase(),
   occupation: joi.string().required().lowercase(),
   bloodGroup: joi.string().lowercase(),
-  socialMedia: joi.array().items(joi.string()),
   lifeStyleInformation: joi
     .object({
       smokingStatus: joi.boolean().required(),

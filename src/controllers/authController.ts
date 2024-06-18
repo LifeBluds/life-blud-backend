@@ -265,6 +265,7 @@ const completeDonorProfile = async (req: Request, res: Response) => {
     );
   }
 };
+
 /**
  * @desc Facility Registration
  */
